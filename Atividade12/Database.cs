@@ -1,10 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Atividade12
 {
@@ -14,30 +10,69 @@ namespace Atividade12
 
         public Database()
         {
-            string connectionString = "Server=localhost;Database=crud;Uid=root;Pwd=Joao2003;";
-            connection = new MySqlConnection(connectionString);
+            try
+            {
+                string connectionString = "Server=localhost;Database=crud;Uid=root;Pwd=Joao2003;";
+                connection = new MySqlConnection(connectionString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao configurar a conexão: {ex.Message}");
+                throw new InvalidOperationException("Falha ao configurar a conexão com o banco de dados.", ex);
+            }
         }
 
+        // Método para obter a conexão
         public MySqlConnection GetConnection()
         {
+            if (connection == null)
+            {
+                throw new InvalidOperationException("A conexão não foi inicializada corretamente.");
+            }
+
             return connection;
         }
 
+        // Método para abrir a conexão com validação de estado
         public void OpenConnection()
         {
-            if (connection.State == ConnectionState.Closed)
+            try
             {
-                connection.Open();
+                if (connection.State == ConnectionState.Closed)
+                {
+                    connection.Open();
+                }
+                else
+                {
+                    Console.WriteLine("A conexão já está aberta.");
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"Erro ao abrir a conexão com o banco de dados: {ex.Message}");
+                throw new InvalidOperationException("Não foi possível abrir a conexão com o banco de dados.", ex);
             }
         }
 
+        // Método para fechar a conexão com validação de estado
         public void CloseConnection()
         {
-            if (connection.State == ConnectionState.Open)
+            try
             {
-                connection.Close();
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+                else
+                {
+                    Console.WriteLine("A conexão já está fechada.");
+                }
+            }
+            catch (MySqlException ex)
+            {
+                Console.WriteLine($"Erro ao fechar a conexão com o banco de dados: {ex.Message}");
+                throw new InvalidOperationException("Não foi possível fechar a conexão com o banco de dados.", ex);
             }
         }
     }
-
 }
